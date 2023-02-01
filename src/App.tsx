@@ -5,10 +5,15 @@ import StepInitial from './components/StepInitial'
 import StepRestaurant from './components/StepRestaurant'
 import StepDish from './components/StepDish'
 import StepReview from './components/StepReview'
+import { Dish } from 'constants/types'
 
 const MAX_STEP = 3
 
-function App() {
+interface IAppProps {
+  dishes: Array<Dish>
+}
+
+function App({ dishes }: IAppProps) {
   const [currentStep, setCurrentStep] = useState(0)
 
   function handlePreviousClick() {
