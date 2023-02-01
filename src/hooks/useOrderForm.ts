@@ -7,6 +7,7 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedMeal, setSelectedMeal] = useState<Meal>('lunch')
   const [numberOfPeople, setNumberOfPeople] = useState(1)
+  const [selectedRestaurant, setSelectedRestaurant] = useState('')
 
   function handleMealChange(event: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedMeal(event.target.value as Meal)
@@ -16,6 +17,10 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
     event: React.ChangeEvent<HTMLInputElement>
   ) {
     setNumberOfPeople(Number(event.target.value))
+  }
+
+  function handleRestaurantChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    setSelectedRestaurant(event.target.value as Meal)
   }
 
   function handlePreviousClick() {
@@ -38,8 +43,18 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
       return
     }
 
+    if (currentStep >= 1 && !selectedMeal) {
+      alert('Please select a restaurant')
+      return
+    }
+
     if (currentStep === LAST_STEP) {
-      console.log('order')
+      console.log('Your order:')
+      console.log({
+        selectedMeal,
+        numberOfPeople,
+        selectedRestaurant
+      })
       return
     }
 
@@ -50,9 +65,11 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
     currentStep,
     selectedMeal,
     numberOfPeople,
+    selectedRestaurant,
 
     handleMealChange,
     handleNumberOfPeopleChange,
+    handleRestaurantChange,
     handlePreviousClick,
     handleNextClick
   }

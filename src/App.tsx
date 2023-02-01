@@ -16,9 +16,11 @@ function App({ dishes }: IAppProps) {
     currentStep,
     selectedMeal,
     numberOfPeople,
+    selectedRestaurant,
 
     handleMealChange,
     handleNumberOfPeopleChange,
+    handleRestaurantChange,
     handlePreviousClick,
     handleNextClick
   } = useOrderForm({
@@ -38,7 +40,14 @@ function App({ dishes }: IAppProps) {
               handleNumberOfPeopleChange={handleNumberOfPeopleChange}
             />
           )}
-          {currentStep === 1 && <StepRestaurant />}
+          {currentStep === 1 && (
+            <StepRestaurant
+              selectedMeal={selectedMeal}
+              dishes={dishes}
+              selectedRestaurant={selectedRestaurant}
+              handleRestaurantChange={handleRestaurantChange}
+            />
+          )}
           {currentStep === 2 && <StepDish />}
           {currentStep === 3 && <StepReview />}
         </div>
