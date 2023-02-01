@@ -1,40 +1,43 @@
-import { useState } from 'react'
-import StepIndicator from './components/StepIndicator'
-import Button from './components/Button'
-import StepInitial from './components/StepInitial'
-import StepRestaurant from './components/StepRestaurant'
-import StepDish from './components/StepDish'
-import StepReview from './components/StepReview'
+import StepIndicator from 'components/StepIndicator'
+import Button from 'components/Button'
+import StepInitial from 'components/StepInitial'
+import StepRestaurant from 'components/StepRestaurant'
+import StepDish from 'components/StepDish'
+import StepReview from 'components/StepReview'
 import { Dish } from 'constants/types'
-
-const MAX_STEP = 3
+import useOrderForm from 'hooks/useOrderForm'
 
 interface IAppProps {
   dishes: Array<Dish>
 }
 
 function App({ dishes }: IAppProps) {
-  const [currentStep, setCurrentStep] = useState(0)
+  const {
+    currentStep,
+    selectedMeal,
+    numberOfPeople,
 
-  function handlePreviousClick() {
-    setCurrentStep((step) => step - 1)
-  }
-
-  function handleNextClick() {
-    if (currentStep === MAX_STEP) {
-      console.log('order')
-      return
-    }
-
-    setCurrentStep((step) => step + 1)
-  }
+    handleMealChange,
+    handleNumberOfPeopleChange,
+    handlePreviousClick,
+    handleNextClick
+  } = useOrderForm({
+    dishes
+  })
 
   return (
     <div className="relative overflow-hidden bg-white">
       <div className="m-auto mt-[100px] w-[350px] rounded border-[1px] border-black">
         <StepIndicator currentStep={currentStep} />
         <div className="h-[500px]">
-          {currentStep === 0 && <StepInitial />}
+          {currentStep === 0 && (
+            <StepInitial
+              selectedMeal={selectedMeal}
+              numberOfPeople={numberOfPeople}
+              handleMealChange={handleMealChange}
+              handleNumberOfPeopleChange={handleNumberOfPeopleChange}
+            />
+          )}
           {currentStep === 1 && <StepRestaurant />}
           {currentStep === 2 && <StepDish />}
           {currentStep === 3 && <StepReview />}

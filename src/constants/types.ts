@@ -1,4 +1,5 @@
-export type Meal = 'breakfast' | 'lunch' | 'dinner'
+export const MealTypes = ['breakfast', 'lunch', 'dinner'] as const
+export type Meal = (typeof MealTypes)[number]
 
 export type Dish = {
   id: number
