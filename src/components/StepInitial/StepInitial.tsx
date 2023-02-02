@@ -1,4 +1,5 @@
 import { MealTypes, Meal } from 'constants/types'
+import { MAX_NUMBER_OF_PEOPLE } from 'constants/index'
 
 interface IStepInitialProps {
   selectedMeal: Meal
@@ -44,7 +45,7 @@ export default function StepInitial({
           type="number"
           inputMode="numeric"
           min="1"
-          max="10"
+          max={MAX_NUMBER_OF_PEOPLE}
           id="people-input"
           className="border-[1px] border-black px-[2px]"
           required

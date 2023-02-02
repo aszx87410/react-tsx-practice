@@ -6,6 +6,7 @@ import StepDish from 'components/StepDish'
 import StepReview from 'components/StepReview'
 import { Dish } from 'constants/types'
 import useOrderForm from 'hooks/useOrderForm'
+import { STEP } from 'constants/index'
 
 interface IAppProps {
   dishes: Array<Dish>
@@ -63,13 +64,23 @@ function App({ dishes }: IAppProps) {
               updateDishQuantity={updateDishQuantity}
             />
           )}
-          {currentStep === 3 && <StepReview />}
+          {currentStep === 3 && (
+            <StepReview
+              selectedMeal={selectedMeal}
+              selectedRestaurant={selectedRestaurant}
+              numberOfPeople={numberOfPeople}
+              selectedDishes={selectedDishes}
+              dishes={dishes}
+            />
+          )}
         </div>
         <div className="m-[8px] flex justify-between border-t-[1px] border-black pt-[8px]">
           <Button onClick={handlePreviousClick} isVisible={currentStep > 0}>
             Previous
           </Button>
-          <Button onClick={handleNextClick}>Next</Button>
+          <Button onClick={handleNextClick}>
+            {currentStep === STEP.REVIEW ? 'Submit' : 'Next'}
+          </Button>
         </div>
       </div>
     </div>

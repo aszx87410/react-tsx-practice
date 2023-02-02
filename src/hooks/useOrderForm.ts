@@ -1,12 +1,6 @@
 import { Meal, SelectedDish } from 'constants/types'
 import { useState, useRef } from 'react'
-
-const STEP = {
-  SELECT_MEAL: 0,
-  SELECT_RESTAURANT: 1,
-  SELECT_DISH: 2,
-  REVIEW: 3
-}
+import { STEP, MAX_NUMBER_OF_PEOPLE } from 'constants/index'
 
 function useOrderForm() {
   const [currentStep, setCurrentStep] = useState(0)
@@ -84,9 +78,9 @@ function useOrderForm() {
       !numberOfPeople ||
       !Number.isInteger(numberOfPeople) ||
       numberOfPeople < 1 ||
-      numberOfPeople > 10
+      numberOfPeople > MAX_NUMBER_OF_PEOPLE
     ) {
-      alert('Number of people should between 1 to 10')
+      alert(`Number of people should between 1 to ${MAX_NUMBER_OF_PEOPLE}`)
       return
     }
 
@@ -131,6 +125,7 @@ function useOrderForm() {
         selectedRestaurant,
         selectedDishes
       })
+      alert('Order success! Please check console for your order detail')
       return
     }
 
