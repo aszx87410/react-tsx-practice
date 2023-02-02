@@ -14,6 +14,7 @@ function Step({ children, isActive }: IStepProps) {
           'bg-sky-300': isActive
         }
       )}
+      data-active={isActive}
     >
       {children}
     </div>
