@@ -29,7 +29,9 @@ function App({ dishes }: IAppProps) {
     updateDishQuantity,
     handlePreviousClick,
     handleNextClick
-  } = useOrderForm()
+  } = useOrderForm({
+    dishes
+  })
 
   return (
     <div className="relative overflow-hidden bg-white">

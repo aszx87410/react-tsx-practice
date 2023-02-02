@@ -1,8 +1,8 @@
-import { Meal, SelectedDish } from 'constants/types'
+import { Dish, Meal, SelectedDish } from 'constants/types'
 import { useState, useRef } from 'react'
 import { STEP, MAX_NUMBER_OF_PEOPLE } from 'constants/index'
 
-function useOrderForm() {
+function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedMeal, setSelectedMeal] = useState<Meal>('lunch')
   const [numberOfPeople, setNumberOfPeople] = useState(1)
@@ -11,6 +11,7 @@ function useOrderForm() {
     { id: undefined, quantity: 1, rowId: 1 }
   ])
   const rowIdRef = useRef(1)
+  const currentRestaurantRef = useRef('')
 
   function handleMealChange(event: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedMeal(event.target.value as Meal)
@@ -84,49 +85,77 @@ function useOrderForm() {
       return
     }
 
-    if (currentStep === STEP.SELECT_RESTAURANT && !selectedRestaurant) {
-      alert('Please select a restaurant')
-      return
-    }
+    switch (currentStep) {
+      // if meal type is updated and selected restaurant is not supported, need to reset
+      case STEP.SELECT_MEAL: {
+        if (
+          selectedRestaurant &&
+          !dishes.find(
+            (item) =>
+              item.restaurant === selectedRestaurant &&
+              item.availableMeals.includes(selectedMeal)
+          )
+        ) {
+          setSelectedRestaurant('')
+        }
+        break
+      }
 
-    if (currentStep === STEP.SELECT_DISH) {
-      if (
-        selectedDishes.find(
-          (item) => !item.quantity || !Number.isInteger(item.quantity)
+      case STEP.SELECT_RESTAURANT: {
+        if (!selectedRestaurant) {
+          alert('Please select a restaurant')
+          return
+        }
+
+        // if restaurant is updated, need to reset dishes
+        if (currentRestaurantRef.current !== selectedRestaurant) {
+          setSelectedDishes([{ id: undefined, quantity: 1, rowId: 1 }])
+        }
+
+        currentRestaurantRef.current = selectedRestaurant
+        break
+      }
+
+      case STEP.SELECT_DISH: {
+        if (
+          selectedDishes.find(
+            (item) => !item.quantity || !Number.isInteger(item.quantity)
+          )
+        ) {
+          alert('Number of quantity should be a integer')
+          return
+        }
+
+        if (selectedDishes.find((item) => !item.id)) {
+          alert('Please select a valid dish or remove the invalid')
+          return
+        }
+
+        const totalQuantity = selectedDishes.reduce(
+          (total, item) => total + item.quantity,
+          0
         )
-      ) {
-        alert('Number of quantity should be a integer')
-        return
+
+        if (totalQuantity < numberOfPeople) {
+          alert(
+            `You have ${numberOfPeople} people but only order ${totalQuantity} servings, please check again`
+          )
+          return
+        }
+        break
       }
 
-      if (selectedDishes.find((item) => !item.id)) {
-        alert('Please select a valid dish or remove the invalid')
+      case STEP.REVIEW: {
+        console.log('Your order:')
+        console.log({
+          selectedMeal,
+          numberOfPeople,
+          selectedRestaurant,
+          selectedDishes
+        })
+        alert('Order success! Please check console for your order detail')
         return
       }
-
-      const totalQuantity = selectedDishes.reduce(
-        (total, item) => total + item.quantity,
-        0
-      )
-
-      if (totalQuantity < numberOfPeople) {
-        alert(
-          `You have ${numberOfPeople} people but only order ${totalQuantity} servings, please check again`
-        )
-        return
-      }
-    }
-
-    if (currentStep === STEP.REVIEW) {
-      console.log('Your order:')
-      console.log({
-        selectedMeal,
-        numberOfPeople,
-        selectedRestaurant,
-        selectedDishes
-      })
-      alert('Order success! Please check console for your order detail')
-      return
     }
 
     setCurrentStep((step) => step + 1)
