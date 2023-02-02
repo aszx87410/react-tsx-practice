@@ -2,6 +2,8 @@
 
 This project is based on [reactjs-vite-tailwindcss-boilerplate](https://github.com/joaopaulomoraes/reactjs-vite-tailwindcss-boilerplate).
 
+Integration test is implemented.
+
 ## Getting Started
 
 ### Install
