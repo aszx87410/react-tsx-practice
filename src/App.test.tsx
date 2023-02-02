@@ -214,4 +214,95 @@ describe('Food Order Form - user flow', () => {
     expect(screen.getByText('food3 - 7')).toBeInTheDocument()
     fireEvent.click(screen.getByText('Submit'))
   })
+
+  it('should reset deal after selecting different restaurant', () => {
+    const { container } = render(<App dishes={mockDishes as Array<Dish>} />)
+    global.alert = jest.fn()
+
+    // step1
+    const inputElement = container.querySelector('#people-input') as Element
+    const mealSelect = container.querySelector('#meal-select') as Element
+    fireEvent.change(inputElement, { target: { value: '5' } })
+    fireEvent.change(mealSelect, { target: { value: 'breakfast' } })
+    fireEvent.click(screen.getByText('Next'))
+
+    // step2
+    const selectElement = container.querySelector(
+      '#restaurant-select'
+    ) as Element
+    fireEvent.click(selectElement)
+    expect(screen.getByText('r-breakfast')).toBeInTheDocument()
+    expect(screen.queryByText('r-lunch')).not.toBeInTheDocument()
+
+    fireEvent.change(selectElement, { target: { value: 'r-breakfast' } })
+    fireEvent.click(screen.getByText('Next'))
+
+    // step3, add new dish
+    const dish1Select = container.querySelector('#dish-select-1') as Element
+    const input1 = container.querySelector('#dish-quantity-input-1') as Element
+    fireEvent.change(dish1Select, { target: { value: '4' } })
+    fireEvent.change(input1, { target: { value: '2' } })
+    fireEvent.click(screen.getByText('Add new dish'))
+    expect(container.querySelector('#dish-select-2')).not.toBeNull()
+
+    // back to previous page, select new restaurant
+    // dishes should reset
+    fireEvent.click(screen.getByText('Previous'))
+    fireEvent.change(container.querySelector('#restaurant-select') as Element, {
+      target: { value: 'r1' }
+    })
+    fireEvent.click(screen.getByText('Next'))
+    expect(
+      container.querySelector('#dish-select-1')?.getAttribute('value')
+    ).toBeNull()
+    expect(
+      container.querySelector('#dish-quantity-input-1')?.getAttribute('value')
+    ).toBe('1')
+    expect(container.querySelector('#dish-select-2')).toBeNull()
+    fireEvent.click(screen.getByText('Add new dish'))
+  })
+
+  it('should reset restaurant after selecting unsupported meal', () => {
+    const { container } = render(<App dishes={mockDishes as Array<Dish>} />)
+    global.alert = jest.fn()
+
+    // step1
+    const inputElement = container.querySelector('#people-input') as Element
+    const mealSelect = container.querySelector('#meal-select') as Element
+    fireEvent.change(inputElement, { target: { value: '5' } })
+    fireEvent.change(mealSelect, { target: { value: 'breakfast' } })
+    fireEvent.click(screen.getByText('Next'))
+
+    // step2
+    const selectElement = container.querySelector(
+      '#restaurant-select'
+    ) as Element
+    fireEvent.click(selectElement)
+    expect(screen.getByText('r-breakfast')).toBeInTheDocument()
+    expect(screen.queryByText('r-lunch')).not.toBeInTheDocument()
+
+    fireEvent.change(selectElement, { target: { value: 'r-breakfast' } })
+    fireEvent.click(screen.getByText('Next'))
+
+    // step3, add new dish
+    const dish1Select = container.querySelector('#dish-select-1') as Element
+    const input1 = container.querySelector('#dish-quantity-input-1') as Element
+    fireEvent.change(dish1Select, { target: { value: '4' } })
+    fireEvent.change(input1, { target: { value: '2' } })
+    fireEvent.click(screen.getByText('Add new dish'))
+    expect(container.querySelector('#dish-select-2')).not.toBeNull()
+
+    // back to step1 and select different meal
+    fireEvent.click(screen.getByText('Previous'))
+    fireEvent.click(screen.getByText('Previous'))
+    fireEvent.change(container.querySelector('#meal-select') as Element, {
+      target: { value: 'lunch' }
+    })
+    fireEvent.click(screen.getByText('Next'))
+
+    // should reset restaurant
+    expect(
+      container.querySelector('#restaurant-select')?.getAttribute('value')
+    ).toBeNull()
+  })
 })
