@@ -17,21 +17,24 @@ function App({ dishes }: IAppProps) {
     selectedMeal,
     numberOfPeople,
     selectedRestaurant,
+    selectedDishes,
 
     handleMealChange,
     handleNumberOfPeopleChange,
     handleRestaurantChange,
+    handleAddNewDishClick,
+    removeSelectedDish,
+    updateSelectedDish,
+    updateDishQuantity,
     handlePreviousClick,
     handleNextClick
-  } = useOrderForm({
-    dishes
-  })
+  } = useOrderForm()
 
   return (
     <div className="relative overflow-hidden bg-white">
       <div className="m-auto mt-[100px] w-[350px] rounded border-[1px] border-black">
         <StepIndicator currentStep={currentStep} />
-        <div className="h-[500px]">
+        <div className="h-[500px] overflow-auto">
           {currentStep === 0 && (
             <StepInitial
               selectedMeal={selectedMeal}
@@ -48,10 +51,21 @@ function App({ dishes }: IAppProps) {
               handleRestaurantChange={handleRestaurantChange}
             />
           )}
-          {currentStep === 2 && <StepDish />}
+          {currentStep === 2 && (
+            <StepDish
+              selectedMeal={selectedMeal}
+              selectedRestaurant={selectedRestaurant}
+              selectedDishes={selectedDishes}
+              dishes={dishes}
+              handleAddNewDishClick={handleAddNewDishClick}
+              removeSelectedDish={removeSelectedDish}
+              updateSelectedDish={updateSelectedDish}
+              updateDishQuantity={updateDishQuantity}
+            />
+          )}
           {currentStep === 3 && <StepReview />}
         </div>
-        <div className="m-[8px] flex justify-between">
+        <div className="m-[8px] flex justify-between border-t-[1px] border-black pt-[8px]">
           <Button onClick={handlePreviousClick} isVisible={currentStep > 0}>
             Previous
           </Button>

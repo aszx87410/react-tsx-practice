@@ -7,3 +7,9 @@ export type Dish = {
   restaurant: string
   availableMeals: Array<Meal>
 }
+
+export type SelectedDish = {
+  id: number | undefined
+  rowId: number
+  quantity: number
+}

@@ -37,6 +37,9 @@ export default function StepRestaurant({
           onChange={handleRestaurantChange}
           required
         >
+          <option value="" hidden>
+            ---
+          </option>
           {restaurants.map((item) => (
             <option key={item} value={item}>
               {item}

@@ -1,13 +1,22 @@
-import { Dish, Meal } from 'constants/types'
-import { useState } from 'react'
+import { Meal, SelectedDish } from 'constants/types'
+import { useState, useRef } from 'react'
 
-const LAST_STEP = 3
+const STEP = {
+  SELECT_MEAL: 0,
+  SELECT_RESTAURANT: 1,
+  SELECT_DISH: 2,
+  REVIEW: 3
+}
 
-function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
+function useOrderForm() {
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedMeal, setSelectedMeal] = useState<Meal>('lunch')
   const [numberOfPeople, setNumberOfPeople] = useState(1)
   const [selectedRestaurant, setSelectedRestaurant] = useState('')
+  const [selectedDishes, setSelectedDishes] = useState<Array<SelectedDish>>([
+    { id: undefined, quantity: 1, rowId: 1 }
+  ])
+  const rowIdRef = useRef(1)
 
   function handleMealChange(event: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedMeal(event.target.value as Meal)
@@ -21,6 +30,44 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
 
   function handleRestaurantChange(event: React.ChangeEvent<HTMLSelectElement>) {
     setSelectedRestaurant(event.target.value as Meal)
+  }
+
+  function handleAddNewDishClick() {
+    rowIdRef.current++
+    setSelectedDishes((currentDishes) => [
+      ...currentDishes,
+      { id: undefined, quantity: 1, rowId: rowIdRef.current }
+    ])
+  }
+
+  function removeSelectedDish(rowId: number) {
+    setSelectedDishes((currentDishes) =>
+      currentDishes.filter((dish) => dish.rowId !== rowId)
+    )
+  }
+
+  function updateSelectedDish(rowId: number, dishId: number) {
+    setSelectedDishes((currentDishes) =>
+      currentDishes.map((dish) => {
+        if (dish.rowId !== rowId) return dish
+        return {
+          ...dish,
+          id: dishId
+        }
+      })
+    )
+  }
+
+  function updateDishQuantity(rowId: number, quantity: number) {
+    setSelectedDishes((currentDishes) =>
+      currentDishes.map((dish) => {
+        if (dish.rowId !== rowId) return dish
+        return {
+          ...dish,
+          quantity
+        }
+      })
+    )
   }
 
   function handlePreviousClick() {
@@ -43,17 +90,46 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
       return
     }
 
-    if (currentStep >= 1 && !selectedMeal) {
+    if (currentStep === STEP.SELECT_RESTAURANT && !selectedRestaurant) {
       alert('Please select a restaurant')
       return
     }
 
-    if (currentStep === LAST_STEP) {
+    if (currentStep === STEP.SELECT_DISH) {
+      if (
+        selectedDishes.find(
+          (item) => !item.quantity || !Number.isInteger(item.quantity)
+        )
+      ) {
+        alert('Number of quantity should be a integer')
+        return
+      }
+
+      if (selectedDishes.find((item) => !item.id)) {
+        alert('Please select a valid dish or remove the invalid')
+        return
+      }
+
+      const totalQuantity = selectedDishes.reduce(
+        (total, item) => total + item.quantity,
+        0
+      )
+
+      if (totalQuantity < numberOfPeople) {
+        alert(
+          `You have ${numberOfPeople} people but only order ${totalQuantity} servings, please check again`
+        )
+        return
+      }
+    }
+
+    if (currentStep === STEP.REVIEW) {
       console.log('Your order:')
       console.log({
         selectedMeal,
         numberOfPeople,
-        selectedRestaurant
+        selectedRestaurant,
+        selectedDishes
       })
       return
     }
@@ -66,10 +142,16 @@ function useOrderForm({ dishes }: { dishes: Array<Dish> }) {
     selectedMeal,
     numberOfPeople,
     selectedRestaurant,
+    selectedDishes,
 
     handleMealChange,
     handleNumberOfPeopleChange,
     handleRestaurantChange,
+    handleAddNewDishClick,
+    removeSelectedDish,
+    updateSelectedDish,
+    updateDishQuantity,
+
     handlePreviousClick,
     handleNextClick
   }
